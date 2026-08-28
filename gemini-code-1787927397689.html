@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thirea Online Test</title>
+    <style>
+        /* === CUSTOM CSS FOR CLEAN UI === */
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --success-bg: #d1fae5;
+            --danger: #ef4444;
+            --danger-bg: #fee2e2;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; padding-bottom: 60px; }
+
+        /* Header */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 0 30px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 30px;
+        }
+        header h1 { font-size: 24px; font-weight: 700; }
+        header h1 span { color: var(--primary); }
+
+        /* Intro & Cards */
+        .card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 24px; margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+        
+        .level-header {
+            background-color: var(--text-main); color: white;
+            padding: 16px 24px; border-radius: 12px; margin: 40px 0 20px 0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .level-header h2 { font-size: 18px; margin: 0; }
+        .level-header span { font-size: 13px; font-weight: normal; opacity: 0.8; }
+
+        .card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Tags */
+        .tag {
+            font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+            background-color: #f1f5f9; color: var(--text-muted); text-transform: uppercase;
+        }
+        .tag-type { background-color: #e0e7ff; color: var(--primary); }
+
+        /* Questions */
+        .question-text { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+
+        /* Radio Options */
+        .options-group { display: flex; flex-direction: column; gap: 10px; }
+        .option-label {
+            display: flex; align-items: center; padding: 14px 16px;
+            border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
+        }
+        .option-label:hover { background-color: #f8fafc; border-color: #cbd5e1; }
+        .option-label input[type="radio"] { margin-right: 12px; transform: scale(1.2); accent-color: var(--primary); }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--primary); color: white; border: none; padding: 16px 28px;
+            font-size: 18px; font-weight: 600; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.2s ease; display: block; width: 100%; text-align: center;
+            margin-top: 40px; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+        .btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .btn-secondary { background-color: var(--text-main); margin-top: 20px; box-shadow: none; }
+        .btn-secondary:hover { background-color: #000; }
+
+        /* Results Section */
+        .hidden { display: none !important; }
+        .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 30px; }
+        .score-box { background-color: #f8fafc; border: 1px solid var(--border-color); padding: 24px; border-radius: 12px; text-align: center; }
+        .score-box h3 { font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+        .score-box p { font-size: 32px; font-weight: 800; color: var(--primary); }
+        .level-result { color: var(--success) !important; }
+
+        /* Review Items */
+        .review-item { padding: 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color); }
+        .review-correct { background-color: var(--success-bg); border-color: var(--success); }
+        .review-incorrect { background-color: var(--danger-bg); border-color: var(--danger); }
+        .review-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+        .correct-text { color: var(--success); }
+        .incorrect-text { color: var(--danger); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>Thirea <span>Online Test</span></h1>
+            <span class="tag" id="status-tag">Status: Testing</span>
+        </header>
+
+        <!-- Intro -->
+        <div id="intro-card" class="card">
+            <h2 style="margin-bottom: 8px;">Comprehensive Placement Exam</h2>
+            <p style="color: var(--text-muted); font-size: 15px;">
+                This test progresses from <strong>Beginner</strong> up to <strong>Diploma</strong> level. Each section contains 10 randomized questions testing Grammar, Vocabulary, and Reading. Answers are locked and graded only when you click "Submit Test" at the very bottom.
+            </p>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container">
+            <form id="quiz-form">
+                <div id="questions-wrapper">
+                    <!-- JS injects grouped questions here -->
+                </div>
+                <button type="button" class="btn" onclick="submitTest()">Submit Test & Get Final Score</button>
+            </form>
+        </div>
+
+        <!-- Results Dashboard -->
+        <div id="results-card" class="card hidden">
+            <h2 style="margin-bottom: 20px; font-size: 24px;">Your Official Assessment</h2>
+            
+            <div class="score-grid">
+                <div class="score-box">
+                    <h3>Total Score</h3>
+                    <p id="score-display">0 / 60</p>
+                </div>
+                <div class="score-box">
+                    <h3>Assigned Level</h3>
+                    <p id="level-display" class="level-result">Calculating...</p>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 16px; font-size: 18px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">Detailed Answer Review</h3>
+            <div id="review-wrapper">
+                <!-- Review details go here -->
+            </div>
+
+            <button class="btn btn-secondary" onclick="window.location.reload()">Take A New Test</button>
+        </div>
+    </div>
+
+    <!-- === JAVASCRIPT LOGIC === -->
+    <script>
+        // 1. The 60-Question Database (10 for each of the 6 levels)
+        const qBank = [
+            // === BEGINNER (10 Questions) ===
+            { lvl: "Beginner", type: "Grammar", q: "I _____ a student.", opts: ["am", "is", "are", "be"], c: 0 },
+            { lvl: "Beginner", type: "Grammar", q: "She _____ in Phnom Penh.", opts: ["live", "lives", "living", "to live"], c: 1 },
+            { lvl: "Beginner", type: "Vocabulary", q: "The color of the sky is usually _____.", opts: ["Green", "Red", "Blue", "Yellow"], c: 2 },
+            { lvl: "Beginner", type: "Grammar", q: "_____ is your name?", opts: ["How", "Who", "What", "When"], c: 2 },
+            { lvl: "Beginner", type: "Vocabulary", q: "What is the opposite of 'Big'?", opts: ["Tall", "Small", "Long", "Heavy"], c: 1 },
+            { lvl: "Beginner", type: "Grammar", q: "They _____ not at home yesterday.", opts: ["was", "were", "are", "did"], c: 1 },
+            { lvl: "Beginner", type: "Vocabulary", q: "You read a _____.", opts: ["Song", "Book", "Chair", "Water"], c: 1 },
+            { lvl: "Beginner", type: "Reading", q: "Read: 'John has two cats and one dog.' How many pets does John have?", opts: ["One", "Two", "Three", "Four"], c: 2 },
+            { lvl: "Beginner", type: "Grammar", q: "I don't have _____ money.", opts: ["some", "any", "a", "many"], c: 1 },
+            { lvl: "Beginner", type: "Vocabulary", q: "Monday, Tuesday, Wednesday, _____.", opts: ["Friday", "Sunday", "Thursday", "Saturday"], c: 2 },
+
+            // === ELEMENTARY (10 Questions) ===
+            { lvl: "Elementary", type: "Grammar", q: "I _____ to the cinema last night.", opts: ["go", "goes", "went", "going"], c: 2 },
+            { lvl: "Elementary", type: "Vocabulary", q: "Can you _____ the door, please? It's cold.", opts: ["open", "close", "make", "take"], c: 1 },
+            { lvl: "Elementary", type: "Grammar", q: "What _____ you doing right now?", opts: ["do", "are", "is", "did"], c: 1 },
+            { lvl: "Elementary", type: "Reading", q: "Read: 'The train arrives at 10:30.' What time is the train coming?", opts: ["Half past nine", "Half past ten", "Quarter to ten", "Ten o'clock"], c: 1 },
+            { lvl: "Elementary", type: "Vocabulary", q: "A person who works in a hospital is a _____.", opts: ["Teacher", "Mechanic", "Doctor", "Pilot"], c: 2 },
+            { lvl: "Elementary", type: "Grammar", q: "She is taller _____ her brother.", opts: ["then", "that", "than", "this"], c: 2 },
+            { lvl: "Elementary", type: "Grammar", q: "Have you ever _____ sushi?", opts: ["eat", "ate", "eaten", "eating"], c: 2 },
+            { lvl: "Elementary", type: "Vocabulary", q: "I need to buy some medicine at the _____.", opts: ["pharmacy", "bakery", "library", "butcher"], c: 0 },
+            { lvl: "Elementary", type: "Grammar", q: "There aren't _____ apples left in the basket.", opts: ["some", "much", "many", "a little"], c: 2 },
+            { lvl: "Elementary", type: "Reading", q: "Read: 'It rained all day Sunday.' What was the weather like?", opts: ["Sunny", "Snowy", "Wet", "Windy"], c: 2 },
+
+            // === INTERMEDIATE (10 Questions) ===
+            { lvl: "Intermediate", type: "Grammar", q: "If I _____ enough money, I would buy a new computer.", opts: ["have", "had", "will have", "would have"], c: 1 },
+            { lvl: "Intermediate", type: "Vocabulary", q: "Please _____ the form with your personal details.", opts: ["fill out", "make up", "take off", "turn down"], c: 0 },
+            { lvl: "Intermediate", type: "Grammar", q: "The letter _____ yesterday morning.", opts: ["was delivered", "delivered", "is delivered", "has delivered"], c: 0 },
+            { lvl: "Intermediate", type: "Reading", q: "Read: 'Despite the traffic, we arrived on time.' What happened?", opts: ["Traffic made them late", "They were early", "Traffic didn't make them late", "There was no traffic"], c: 2 },
+            { lvl: "Intermediate", type: "Vocabulary", q: "He's very _____. He always says 'please' and 'thank you'.", opts: ["rude", "polite", "lazy", "arrogant"], c: 1 },
+            { lvl: "Intermediate", type: "Grammar", q: "She asked me where _____.", opts: ["I live", "did I live", "do I live", "I lived"], c: 3 },
+            { lvl: "Intermediate", type: "Vocabulary", q: "The meeting was _____ because the manager was sick.", opts: ["put off", "called out", "taken over", "given up"], c: 0 },
+            { lvl: "Intermediate", type: "Grammar", q: "By next week, I _____ this project.", opts: ["finish", "will finish", "will have finished", "am finishing"], c: 2 },
+            { lvl: "Intermediate", type: "Reading", q: "If something is 'mandatory', it is _____.", opts: ["Optional", "Required", "Suggested", "Forbidden"], c: 1 },
+            { lvl: "Intermediate", type: "Grammar", q: "I wish I _____ so much coffee before bed.", opts: ["didn't drink", "hadn't drunk", "haven't drunk", "wouldn't drink"], c: 1 },
+
+            // === UPPER-INTERMEDIATE (10 Questions) ===
+            { lvl: "Upper-Intermediate", type: "Grammar", q: "Not only _____ the game, but they also broke the record.", opts: ["they won", "did they win", "won they", "they did win"], c: 1 },
+            { lvl: "Upper-Intermediate", type: "Vocabulary", q: "The company had to _____ a lot of staff due to budget cuts.", opts: ["lay off", "put off", "take on", "step down"], c: 0 },
+            { lvl: "Upper-Intermediate", type: "Grammar", q: "You _____ have seen him yesterday; he is currently in Japan.", opts: ["mustn't", "shouldn't", "can't", "wouldn't"], c: 2 },
+            { lvl: "Upper-Intermediate", type: "Reading", q: "Read: 'The manager's ambiguous instructions led to chaos.' The instructions were: ", opts: ["Clear", "Unclear", "Strict", "Helpful"], c: 1 },
+            { lvl: "Upper-Intermediate", type: "Vocabulary", q: "We need to tackle the _____ cause of the problem.", opts: ["root", "base", "start", "floor"], c: 0 },
+            { lvl: "Upper-Intermediate", type: "Grammar", q: "I'd rather you _____ smoke inside the house.", opts: ["don't", "didn't", "won't", "haven't"], c: 1 },
+            { lvl: "Upper-Intermediate", type: "Vocabulary", q: "His explanation was highly _____, it made no logical sense.", opts: ["plausible", "lucid", "absurd", "coherent"], c: 2 },
+            { lvl: "Upper-Intermediate", type: "Grammar", q: "He is believed _____ the country under a false name.", opts: ["to leave", "leaving", "to have left", "having left"], c: 2 },
+            { lvl: "Upper-Intermediate", type: "Reading", q: "Synonym for 'fluctuate':", opts: ["Remain steady", "Increase steadily", "Change frequently", "Decrease sharply"], c: 2 },
+            { lvl: "Upper-Intermediate", type: "Grammar", q: "Rarely _____ such a beautifully designed website.", opts: ["I have seen", "have I seen", "did I saw", "I see"], c: 1 },
+
+            // === ADVANCED (10 Questions) ===
+            { lvl: "Advanced", type: "Grammar", q: "Had we known about the storm, we _____ alternative arrangements.", opts: ["would make", "will make", "would have made", "made"], c: 2 },
+            { lvl: "Advanced", type: "Vocabulary", q: "The politician delivered a rather _____ speech to avoid answering directly.", opts: ["candid", "evasive", "succinct", "lucid"], c: 1 },
+            { lvl: "Advanced", type: "Grammar", q: "It is imperative that she _____ present at the board meeting.", opts: ["is", "be", "was", "will be"], c: 1 },
+            { lvl: "Advanced", type: "Reading", q: "If an argument is 'irrefutable', it is:", opts: ["Easily broken", "Flawed", "Impossible to deny", "Offensive"], c: 2 },
+            { lvl: "Advanced", type: "Vocabulary", q: "She has a _____ for remembering obscure historical dates.", opts: ["knack", "flaw", "stint", "quirk"], c: 0 },
+            { lvl: "Advanced", type: "Grammar", q: "Scarcely _____ the room when the phone started ringing.", opts: ["I had entered", "entered I", "did I enter", "had I entered"], c: 3 },
+            { lvl: "Advanced", type: "Vocabulary", q: "The new tax policy will _____ the gap between rich and poor.", opts: ["exacerbate", "mitigate", "alleviate", "appease"], c: 0 },
+            { lvl: "Advanced", type: "Grammar", q: "I'll have the mechanic _____ the brakes on my car.", opts: ["check", "to check", "checking", "checked"], c: 0 },
+            { lvl: "Advanced", type: "Reading", q: "What does 'to play devil's advocate' mean?", opts: ["To do something evil", "To argue against a point just to test it", "To agree completely", "To remain silent"], c: 1 },
+            { lvl: "Advanced", type: "Grammar", q: "No matter _____ hard he tried, he couldn't solve the algorithm.", opts: ["what", "how", "if", "though"], c: 1 },
+
+            // === DIPLOMA (10 Questions) ===
+            { lvl: "Diploma", type: "Grammar", q: "But for his timely intervention, the project _____ completely.", opts: ["would fail", "had failed", "would have failed", "failed"], c: 2 },
+            { lvl: "Diploma", type: "Vocabulary", q: "The CEO's attitude bordered on _____; she believed she could do no wrong.", opts: ["hubris", "pragmatism", "altruism", "stoicism"], c: 0 },
+            { lvl: "Diploma", type: "Grammar", q: "Try _____ you might, you cannot bend the rules of physics.", opts: ["as", "though", "how", "what"], c: 0 },
+            { lvl: "Diploma", type: "Reading", q: "A 'Pyrrhic victory' implies that the win was:", opts: ["Easy", "Glorious", "Achieved at too great a cost", "Undeserved"], c: 2 },
+            { lvl: "Diploma", type: "Vocabulary", q: "His writing style is highly _____, filled with unnecessarily complex vocabulary.", opts: ["succinct", "pedantic", "lucid", "colloquial"], c: 1 },
+            { lvl: "Diploma", type: "Grammar", q: "Were the government to resign, the economy _____ into chaos.", opts: ["will plunge", "would plunge", "plunged", "had plunged"], c: 1 },
+            { lvl: "Diploma", type: "Vocabulary", q: "The evidence presented in court was entirely _____, based on rumors.", opts: ["empirical", "irrefutable", "hearsay", "tangible"], c: 2 },
+            { lvl: "Diploma", type: "Grammar", q: "She objected to _____ treated as if she were a beginner.", opts: ["be", "being", "have been", "having"], c: 1 },
+            { lvl: "Diploma", type: "Reading", q: "If someone is described as 'sycophantic', they are:", opts: ["Rebellious", "Overly flattering to authority", "Deeply depressed", "Highly intelligent"], c: 1 },
+            { lvl: "Diploma", type: "Grammar", q: "Such _____ the force of the explosion that windows shattered miles away.", opts: ["is", "was", "has been", "had been"], c: 1 }
+        ];
+
+        // Ensure questions have IDs
+        qBank.forEach((q, i) => q.id = i + 1);
+
+        const levelOrder = ["Beginner", "Elementary", "Intermediate", "Upper-Intermediate", "Advanced", "Diploma"];
+        let testQuestions = []; // Will hold the ordered, grouped questions
+        let userAnswers = {};
+
+        // Shuffle utility
+        function shuffle(array) {
+            let current = array.length, random;
+            while (current !== 0) {
+                random = Math.floor(Math.random() * current);
+                current--;
+                [array[current], array[random]] = [array[random], array[current]];
+            }
+            return array;
+        }
+
+        // Initialize Test: Group by level, shuffle inside the level, then render
+        function initTest() {
+            const wrapper = document.getElementById('questions-wrapper');
+            wrapper.innerHTML = '';
+            testQuestions = [];
+
+            let globalQuestionNumber = 1;
+
+            levelOrder.forEach(lvl => {
+                // Get the 10 questions for this specific level
+                let questionsInLevel = qBank.filter(q => q.lvl === lvl);
+                // Shuffle the 10 questions so order changes on reload
+                questionsInLevel = shuffle(questionsInLevel);
+                
+                // Add to master list
+                testQuestions = testQuestions.concat(questionsInLevel);
+
+                // Create Level Section Header
+                const levelDiv = document.createElement('div');
+                levelDiv.innerHTML = `
+                    <div class="level-header">
+                        <h2>Level: ${lvl}</h2>
+                        <span>10 Questions</span>
+                    </div>
+                `;
+                wrapper.appendChild(levelDiv);
+
+                // Generate HTML for each question in this level
+                questionsInLevel.forEach((q) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'card';
+                    
+                    let optionsHTML = '';
+                    q.opts.forEach((opt, optIndex) => {
+                        optionsHTML += `
+                            <label class="option-label">
+                                <input type="radio" name="q_${q.id}" value="${optIndex}" onchange="saveAnswer(${q.id}, ${optIndex})">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+
+                    qDiv.innerHTML = `
+                        <div class="card-header">
+                            <span class="tag">Question ${globalQuestionNumber} of 60</span>
+                            <span class="tag tag-type">${q.type}</span>
+                        </div>
+                        <div class="question-text">${q.q}</div>
+                        <div class="options-group">
+                            ${optionsHTML}
+                        </div>
+                    `;
+                    wrapper.appendChild(qDiv);
+                    globalQuestionNumber++;
+                });
+            });
+        }
+
+        function saveAnswer(questionId, optionIndex) {
+            userAnswers[questionId] = optionIndex;
+        }
+
+        function submitTest() {
+            // Validate all 60 questions answered
+            if(Object.keys(userAnswers).length < 60) {
+                const remaining = 60 - Object.keys(userAnswers).length;
+                alert(`Please answer all questions. You have ${remaining} questions left.`);
+                return;
+            }
+
+            let score = 0;
+            
+            // UI transitions
+            document.getElementById('intro-card').classList.add('hidden');
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('results-card').classList.remove('hidden');
+            
+            const statusTag = document.getElementById('status-tag');
+            statusTag.innerText = "Assessment Graded";
+            statusTag.style.backgroundColor = "var(--text-main)";
+            statusTag.style.color = "white";
+
+            const reviewWrapper = document.getElementById('review-wrapper');
+            reviewWrapper.innerHTML = '';
+
+            // Calculate score and build review
+            testQuestions.forEach((q, index) => {
+                const userAnswer = userAnswers[q.id];
+                const isCorrect = userAnswer === q.c;
+                if (isCorrect) score++;
+
+                const reviewBox = document.createElement('div');
+                reviewBox.className = `review-item ${isCorrect ? 'review-correct' : 'review-incorrect'}`;
+                
+                reviewBox.innerHTML = `
+                    <div class="review-title ${isCorrect ? 'correct-text' : 'incorrect-text'}">
+                        ${isCorrect ? '✔ CORRECT' : '✘ INCORRECT'} — Q${index + 1} (${q.lvl} - ${q.type})
+                    </div>
+                    <p style="margin-bottom: 8px; font-weight: 500;">${q.q}</p>
+                    <p style="font-size: 14px; color: var(--text-muted);">
+                        Your Answer: <strong>${q.opts[userAnswer]}</strong>
+                    </p>
+                    ${!isCorrect ? `
+                        <p style="font-size: 14px; color: var(--text-muted);">
+                            Correct Answer: <strong style="color: var(--success);">${q.opts[q.c]}</strong>
+                        </p>
+                    ` : ''}
+                `;
+                reviewWrapper.appendChild(reviewBox);
+            });
+
+            // Accurate Level Assignment based on 60 points
+            let assignedLevel = "Beginner";
+            if (score >= 52) assignedLevel = "Diploma (C2)";
+            else if (score >= 42) assignedLevel = "Advanced (C1)";
+            else if (score >= 32) assignedLevel = "Upper-Intermediate (B2)";
+            else if (score >= 22) assignedLevel = "Intermediate (B1)";
+            else if (score >= 12) assignedLevel = "Elementary (A2)";
+
+            document.getElementById('score-display').innerText = `${score} / 60`;
+            document.getElementById('level-display').innerText = assignedLevel;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.onload = initTest;
+    </script>
+</body>
+</html>
